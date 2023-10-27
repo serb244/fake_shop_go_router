@@ -7,4 +7,7 @@ class RouteConstants {
 
   static const String productListPath = '/products';
   static const String productListName = 'products';
+
+  static const String productCategoryListPath = 'productsCategory';
+  static const String productCategoryListName = 'productsCategory';
 }

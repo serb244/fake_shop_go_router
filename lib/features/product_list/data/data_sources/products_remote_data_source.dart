@@ -19,9 +19,8 @@ class ProductsRemoteDataSourceImpl implements ProductsRemoteDataSource {
   Future<List<ProductModel>> getProducts() async {
     final response = await dio.get(ApiUrls.productsEndpoint);
     if (response.statusCode == 200) {
-      List<Map<String, dynamic>> res = jsonDecode(response.data);
       List<ProductModel> products = [];
-      for (Map<String, dynamic> data in res) {
+      for (Map<String, dynamic> data in response.data) {
         products.add(ProductModel.fromJson(data));
       }
       return products;

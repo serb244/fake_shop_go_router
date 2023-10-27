@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -7,17 +9,28 @@ import '../../../../locator.dart';
 import '../manager/product_bloc.dart';
 
 class ProductListScreen extends StatelessWidget {
-  final String categoryName;
-
-  const ProductListScreen({required this.categoryName, super.key});
+  const ProductListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final String? categoryName = GoRouterState.of(context).pathParameters['categoryName'];
+    log('categoryName: $categoryName');
     return BlocProvider(
-      create: (context) => locator<ProductsBloc>()..add(GetProductsByCategoryEvent(categoryName)),
+      create: (context) => locator<ProductsBloc>()
+        ..add(categoryName == null ? GetProductsEvent() : GetProductsByCategoryEvent(categoryName)),
       child: Scaffold(
+        appBar: AppBar(actions: [
+          context.canPop()
+              ? IconButton(
+                  onPressed: () {
+                    context.pop();
+                  },
+                  icon: const Icon(Icons.backspace))
+              : const SizedBox.shrink()
+        ]),
         body: BlocBuilder<ProductsBloc, ProductsState>(
           builder: (context, state) {
+            RouteInformation;
             if (state is ProductsLoadedState) {
               return ListView.builder(
                   itemCount: state.products.length,
@@ -26,7 +39,6 @@ class ProductListScreen extends StatelessWidget {
                         onPressed: () {
                           final int productID = state.products[index].id;
                           final String name = state.products[index].name;
-                          final path = '${RouteConstants.productDetailPath}/$name';
                           context.goNamed(
                             RouteConstants.productDetailName,
                             pathParameters: {
@@ -37,15 +49,6 @@ class ProductListScreen extends StatelessWidget {
                             },
                           );
                         },
-                        // onPressed: () {
-                        //   final int productID = state.products[index].id;
-                        //   final String name = state.products[index].name;
-                        //   final path = '${RouteConstants.productDetailPath}/$name';
-                        //   context.go(
-                        //     path,
-                        //     extra: productID,
-                        //   );
-                        // },
                         child: Text(state.products[index].name));
                   });
             } else if (state is ProductFailure) {

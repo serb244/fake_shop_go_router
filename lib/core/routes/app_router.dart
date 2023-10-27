@@ -6,11 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/product_detail/presentation/pages/product_detail_screen.dart';
+import 'go_router_observer.dart';
 import 'route_constants.dart';
 
 class AppRouter {
   GoRouter get router => _router;
   final GoRouter _router = GoRouter(
+    // routerNeglect: true,
+    observers: [
+      GoRouterObserver(),
+    ],
     debugLogDiagnostics: true,
     routes: <RouteBase>[
       GoRoute(
@@ -21,31 +26,37 @@ class AppRouter {
         },
       ),
       GoRoute(
-        name: RouteConstants.productListName,
-        path: '${RouteConstants.productListPath}/:categoryName',
-        builder: (BuildContext context, GoRouterState state) {
-          return ProductListScreen(
-            categoryName: state.pathParameters['categoryName'] ?? '',
-          );
-        },
-      ),
+          name: RouteConstants.productListName,
+          path: RouteConstants.productListPath,
+          builder: (BuildContext context, GoRouterState state) {
+            return const ProductListScreen();
+          },
+          routes: [
+            GoRoute(
+                name: RouteConstants.productCategoryListName,
+                path: ':categoryName',
+                builder: (BuildContext context, GoRouterState state) {
+                  return const ProductListScreen();
+                }),
+          ]),
       GoRoute(
         name: RouteConstants.productDetailName,
         path: '${RouteConstants.productDetailPath}/:name',
         builder: (BuildContext context, GoRouterState state) {
-          // final Map<String, String> queryParameters = GoRouterState.of(context).uri.queryParameters;
-          // final Map<String, List<String>> queryParametersAll =
-          //     GoRouterState.of(context).uri.queryParametersAll;
-          // log(queryParameters.toString());
-          // log(queryParametersAll.toString());
-          final name = state.pathParameters['name'];
-          // final id = state.pathParameters['id'];
-          final id = state.uri.queryParameters['id'];
-          return ProductDetailScreen(
-            name: name ?? '',
-            id: id ?? '',
-          );
+          return const ProductDetailScreen();
         },
+        // redirect: (context, state) {
+        //   log('redirect state: ${state}');
+        //   log('redirect state.uri.queryParameters: ${state.uri.queryParameters}');
+        //   log('redirect state.pathParameters: ${state.pathParameters}');
+        //   try {
+        //     return int.parse(state.uri.queryParameters['id']!) > 10
+        //         ? null
+        //         : RouteConstants.productListPath + "/jewelery";
+        //   } catch (e) {
+        //     return null;
+        //   }
+        // },
       ),
     ],
   );
